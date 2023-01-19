@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
@@ -33,18 +33,31 @@ namespace Server
                 clientSocket = serverSocket.AcceptTcpClient();
                 NetworkStream networkStream = clientSocket.GetStream();
 
-                string RespuestaServer = ">>Ingresa tu nombre: ";
-                outData = Encoding.ASCII.GetBytes(RespuestaServer);
+                string ServerRequest = ">>Ingresa tu nombre: ";
+                outData = Encoding.ASCII.GetBytes(ServerRequest);
                 networkStream.Write(outData, 0, outData.Length);
                 networkStream.Flush();
 
                 networkStream.Read(inData, 0, 64);
                 string clientData = Encoding.ASCII.GetString(inData);
-                //string NombreCliente = DatosDelCliente.Substring(0, DatosDelCliente.IndexOf("$"));
 
-                Console.WriteLine(">>Conexion exitosa con "+clientData);
+                /*
+                    clientPlayer == Identificador de Conexion de cada cliente
+                    CountPlayers == Identificar primer jugador
+                */
+                string clientPlayer = clientData;
+                clientControl.CountPlayers++;
 
-                Thread ThreadPlayer = new Thread(() => clientControl.StartGame(networkStream));
+                /*
+                    ListPlayer = clientPlayer + puntaje
+                */
+                Console.WriteLine(">>Conexion exitosa con: "+clientData);
+                clientControl.ListPlayer.Add(clientPlayer, 0);
+
+                /*
+                    NOTA: Obj clientControl como parametro para que todos los jugadores utilicen este objeto
+                */
+                Thread ThreadPlayer = new Thread(() => clientControl.WaitingPlayers(networkStream, clientControl));
                 ThreadPlayer.Start();
             }
         }
@@ -52,10 +65,41 @@ namespace Server
 
     public class ClientControl
     {
-        public void StartGame(NetworkStream networkStream)
+        public int CountPlayers = 0;
+        public SortedList ListPlayer = new SortedList();
+        private bool StartGame = false;
+
+
+        private string ServerRequest = "";
+        private string clientData = "";
+        private byte[] inData = new byte[64];
+        private byte[] outData = new byte[64];
+
+        public void WaitingPlayers(NetworkStream networkStream, ClientControl clientControl)
         {
+            /*
+             Identificar primer jugador:
+                Si CountPlayers != 1 ya hay mas jugadores conectados
+                Si CountPlayers == 1 primer jugador conectado, este decide cuando inicia la trivia 
+                Otros jugadores esperan inicio de juego...
+            */
+
+            ServerRequest = Convert.ToString(CountPlayers);
+            outData = Encoding.ASCII.GetBytes(ServerRequest);
+            networkStream.Write(outData, 0, outData.Length);
+            networkStream.Flush();
+
+            while (clientControl.StartGame == false)
+            {
+                networkStream.Read(inData, 0, 64);
+                clientData = Encoding.ASCII.GetString(inData);
+
+                if(clientData == "1")
+                {
+                    break;
+                }
+            }
 
         }
-
     }
 }
