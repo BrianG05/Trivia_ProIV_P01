@@ -1,0 +1,8 @@
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\bin\Debug\Server.exe.config
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\bin\Debug\Server.exe
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\bin\Debug\Server.pdb
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\obj\Debug\Server.csproj.AssemblyReference.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\obj\Debug\Server.csproj.SuggestedBindingRedirects.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\obj\Debug\Server.exe
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Server\Server\obj\Debug\Server.pdb
