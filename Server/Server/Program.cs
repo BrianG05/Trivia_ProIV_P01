@@ -36,7 +36,9 @@ namespace Server
                 clientSocket = serverSocket.AcceptTcpClient();
                 ClientControl.List_Players.Add(clientSocket);
                 numPlayer++;
-                clientControl.AddPlayersName(numPlayer);
+
+                Thread threadPlayer = new Thread(() => clientControl.AddPlayersName(numPlayer));
+                threadPlayer.Start();
             }
         }
     }
@@ -48,7 +50,7 @@ namespace Server
         private byte[] inData = new byte[64];
         private byte[] outData = new byte[64];
 
-        private static bool StartGame = false;
+        private static int StartGame = 2;
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
@@ -73,7 +75,6 @@ namespace Server
             return clientData;
         }
 
-
         public void AddPlayersName(int numPlayer)
         {
             TcpClient client = List_Players[numPlayer-1];
@@ -84,7 +85,7 @@ namespace Server
 
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
 
-            //WaitingPlayers(numPlayer);
+            WaitingPlayers(numPlayer);
         }
 
         public void WaitingPlayers(int numPlayer) 
@@ -92,25 +93,23 @@ namespace Server
             if (numPlayer == 1)
             {
                 TcpClient client = List_Players[0];
-                NetworkStream networkStream = client.GetStream();
-                outMsg(client, "1");
+                outMsg(client, "1$");
 
-                String clientData = inMsg(client);
+                string clientData = inMsg(client);
 
-                if(clientData == "Start")
-                {
+                StartGame = 3;
 
-                }
             }
             else
             {
-                TcpClient client = List_Players[0];
-                NetworkStream networkStream = client.GetStream();
-                outMsg(client, "1");
-
-                while (StartGame = false)
+                while (StartGame == 2)
                 {
+                    for (int i = 1; i < List_Players.Count; i++)
+                    {
+                        outMsg(List_Players[i], Convert.ToString(StartGame) +"$");
 
+                        string clientData = inMsg(List_Players[i]);
+                    }
                 }
             }
         }

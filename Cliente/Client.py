@@ -1,4 +1,6 @@
+import os
 import socket
+import time
 
 class ClassPlayer:
     def __init__(self, PlayerName):
@@ -36,4 +38,24 @@ def Main():
 
     #Recibe si es el primer jugador o no
 
+    
+    while(True):
+        strData = inMsg(ClientSocket)
+
+        if(strData == "1"):
+            input("Presione enter para inciar juego")
+            outMsg(client=ClientSocket,msg="1$")
+            print("El juego ha iniciado! ")
+            break
+        elif (strData == "2"):
+            os.system('cls')
+            print("Esperando Jugadores")
+            outMsg(client=ClientSocket,msg="2$")
+        else:
+            os.system('cls')
+            print("El juego ha iniciado! ")
+            outMsg(client=ClientSocket,msg="2$")
+            break;
+        time.sleep(1)
+        
 Main()
