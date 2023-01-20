@@ -23,17 +23,4 @@ def Main():
         client.sendall(clientName.encode('utf-8'))
 
 
-        byteData = client.recv(64)
-        countPlayers = byteData.decode('UTF-8')  
-
-        if(countPlayers == 1):
-
-            i = int(input("Ingrese 1 si desea iniciar el juego: "))
-            if(i == 1):
-                pass
-            
-            
-        else:
-            print("No eres el primer jugador")
-
 Main()
