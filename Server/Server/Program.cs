@@ -79,7 +79,7 @@ namespace Server
             TcpClient client = List_Players[numPlayer-1];
             NetworkStream networkStream = client.GetStream();
 
-            outMsg(client, "<<Ingresa tu nombre: ");
+            outMsg(client, "<<Ingresa tu nombre:$");
             string clientData = inMsg(client);
 
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
@@ -93,10 +93,9 @@ namespace Server
             {
                 TcpClient client = List_Players[0];
                 NetworkStream networkStream = client.GetStream();
-                outMsg(client, "<<Ingrese enter para iniciar juego");
+                outMsg(client, "1");
 
                 String clientData = inMsg(client);
-
 
                 if(clientData == "Start")
                 {
@@ -105,6 +104,10 @@ namespace Server
             }
             else
             {
+                TcpClient client = List_Players[0];
+                NetworkStream networkStream = client.GetStream();
+                outMsg(client, "1");
+
                 while (StartGame = false)
                 {
 

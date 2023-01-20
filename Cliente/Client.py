@@ -6,10 +6,17 @@ class ClassPlayer:
     
 
 def inMsg(client):
+    strMsg = ""
     byteData = client.recv(64)
     strData = byteData.decode('UTF-8')
 
-    return strData 
+    for i in strData:
+        if(i != "$"):
+            strMsg += i
+        else:
+            break
+
+    return strMsg 
 
 def outMsg(client, msg):
     client.send(msg.encode('utf-8'))
@@ -19,13 +26,14 @@ def Main():
 
     ClientSocket.connect(("127.0.0.1", 8888))
 
-    byteData = ClientSocket.recv(64)
-    strData = byteData.decode('UTF-8')  
+
+    strData = inMsg(ClientSocket) 
 
     #Enviar el nombre del jugador
     clientName = input(strData+"\n")
     player = ClassPlayer(clientName)
     outMsg(client=ClientSocket,msg=clientName+"$")
 
+    #Recibe si es el primer jugador o no
 
 Main()
