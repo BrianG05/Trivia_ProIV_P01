@@ -48,8 +48,9 @@ namespace Server
         private byte[] inData = new byte[64];
         private byte[] outData = new byte[64];
 
-        private static bool StarGame = false;
+        private static bool StartGame = false;
 
+        //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
         {
             byte[] outData = new byte[64];
@@ -59,6 +60,7 @@ namespace Server
             networkStream.Flush();
         }
 
+        //Para recibir datos del cliente
         private static string inMsg(TcpClient client)
         {
             byte[] inData = new byte[64];
@@ -66,6 +68,7 @@ namespace Server
             NetworkStream networkStream = client.GetStream();
             networkStream.Read(inData, 0, 64);
             string clientData = Encoding.ASCII.GetString(inData);
+            clientData = clientData.Substring(0, clientData.IndexOf("$"));
 
             return clientData;
         }
@@ -90,19 +93,19 @@ namespace Server
             {
                 TcpClient client = List_Players[0];
                 NetworkStream networkStream = client.GetStream();
+                outMsg(client, "<<Ingrese enter para iniciar juego");
 
-                string ServerRequest = "<<Ingresa enter para empezar juego: ";
-                outData = Encoding.ASCII.GetBytes(ServerRequest);
-                networkStream.Write(outData, 0, outData.Length);
-                networkStream.Flush();
+                String clientData = inMsg(client);
 
-                networkStream.Read(inData, 0, 64);
-                string clientData = Encoding.ASCII.GetString(inData);
 
+                if(clientData == "Start")
+                {
+
+                }
             }
             else
             {
-                while (StarGame = false)
+                while (StartGame = false)
                 {
 
                 }
