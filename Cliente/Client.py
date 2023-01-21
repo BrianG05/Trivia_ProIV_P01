@@ -12,7 +12,7 @@ def inMsg(client):
     byteData = client.recv(64)
     strData = byteData.decode('UTF-8')
 
-    for i in strData:
+    for i in strData:   
         if(i != "$"):
             strMsg += i
         else:
@@ -30,7 +30,7 @@ def Main():
 
 
     strData = inMsg(ClientSocket) 
-
+    os.system('cls')
     #Enviar el nombre del jugador
     clientName = input(strData+"\n")
     player = ClassPlayer(clientName)
@@ -54,7 +54,7 @@ def Main():
         else:
             os.system('cls')
             print("El juego ha iniciado! ")
-            outMsg(client=ClientSocket,msg="2$")
+            outMsg(client=ClientSocket,msg="3$")
             break;
         time.sleep(1)
         

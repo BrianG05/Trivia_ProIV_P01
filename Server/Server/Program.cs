@@ -37,6 +37,9 @@ namespace Server
                 ClientControl.List_Players.Add(clientSocket);
                 numPlayer++;
 
+                /*
+                       AddPlayersName representa el metodo de inicio del juego
+                */
                 Thread threadPlayer = new Thread(() => clientControl.AddPlayersName(numPlayer));
                 threadPlayer.Start();
             }
@@ -50,7 +53,7 @@ namespace Server
         private byte[] inData = new byte[64];
         private byte[] outData = new byte[64];
 
-        private static int StartGame = 2;
+        private static int StartGameFirstPlayer = 2;
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
@@ -97,18 +100,32 @@ namespace Server
 
                 string clientData = inMsg(client);
 
-                StartGame = 3;
+                /*
+                    StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
+                    terminen sus bucles while. Esta variable solo es alterada por el primer jugador que se conecto
+
+                    StartGameOthersPlayers permite que el bucle while (StartGameOthersPlayers != true) termine ya que el 
+                    break dentro solo rompe el ciclo for
+                */
+                StartGameFirstPlayer = 3;
 
             }
             else
             {
-                while (StartGame == 2)
+                bool StartGameOthersPlayers = false;
+                while (StartGameOthersPlayers != true)
                 {
                     for (int i = 1; i < List_Players.Count; i++)
                     {
-                        outMsg(List_Players[i], Convert.ToString(StartGame) +"$");
+                        outMsg(List_Players[i], Convert.ToString(StartGameFirstPlayer) +"$");
 
                         string clientData = inMsg(List_Players[i]);
+
+                        if(clientData == "3")
+                        {
+                            StartGameOthersPlayers = true;
+                            break;
+                        }
                     }
                 }
             }
