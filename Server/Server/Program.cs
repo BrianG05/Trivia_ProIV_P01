@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Xml.Linq;
+using System.Collections;
 
 namespace Server
 {
@@ -50,6 +51,8 @@ namespace Server
     {
         public static List<TcpClient> List_Players = new List<TcpClient>();
 
+        private static Hashtable List_Player_Score = new Hashtable();
+
         private byte[] inData = new byte[64];
         private byte[] outData = new byte[64];
 
@@ -86,12 +89,16 @@ namespace Server
             outMsg(client, "<<Ingresa tu nombre:$");
             string clientData = inMsg(client);
 
+            //Nombre jugador - Puntaje
+            List_Player_Score.Add(clientData, 0);
+
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
 
             WaitingPlayers(numPlayer);
+
         }
 
-        public void WaitingPlayers(int numPlayer) 
+        private void WaitingPlayers(int numPlayer) 
         {
             if (numPlayer == 1)
             {
@@ -103,30 +110,35 @@ namespace Server
                 /*
                     StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
                     terminen sus bucles while. Esta variable solo es alterada por el primer jugador que se conecto
-
-                    StartGameOthersPlayers permite que el bucle while (StartGameOthersPlayers != true) termine ya que el 
-                    break dentro solo rompe el ciclo for
                 */
                 StartGameFirstPlayer = 3;
-
             }
             else
             {
-                bool StartGameOthersPlayers = false;
-                while (StartGameOthersPlayers != true)
+                int i = 1;
+                while (true)
                 {
-                    for (int i = 1; i < List_Players.Count; i++)
+          
+                    if (i == List_Players.Count)
                     {
-                        outMsg(List_Players[i], Convert.ToString(StartGameFirstPlayer) +"$");
-
-                        string clientData = inMsg(List_Players[i]);
-
-                        if(clientData == "3")
-                        {
-                            StartGameOthersPlayers = true;
-                            break;
-                        }
+                        i = 1;
                     }
+
+                    outMsg(List_Players[i], Convert.ToString(StartGameFirstPlayer) + "$");
+
+                    string clientData = inMsg(List_Players[i]);
+
+                    /*
+                            Si el valor StartGameFirstPlayer envia un 3 a el cliente este mismo regresa otro 3 para terminar bucle
+                    */
+                    if (clientData == "3")
+                    {
+                       break;
+                    }
+
+                    i++;
+
+                    Thread.Sleep(1);
                 }
             }
         }

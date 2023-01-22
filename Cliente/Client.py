@@ -38,7 +38,7 @@ def Main():
 
     #Recibe si es el primer jugador o no
 
-    
+    #Bloque correspondiente a la espera de los demas clientes
     while(True):
         strData = inMsg(ClientSocket)
 
@@ -57,5 +57,6 @@ def Main():
             outMsg(client=ClientSocket,msg="3$")
             break;
         time.sleep(1)
-        
+
+    print("Ya puede cerrar la ostia paire!")
 Main()
