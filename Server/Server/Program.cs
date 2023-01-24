@@ -55,7 +55,10 @@ namespace Server
         private static SortedList sList_Player_Score = new SortedList();
 
         private int StartGameFirstPlayer = 2;
-        
+
+
+        private Thread SendQuestionClient;
+
         /*
              Esta ruta es dada como respuesta por parte del cliente
         */
@@ -128,8 +131,9 @@ namespace Server
                     Console.WriteLine("Pregunta: " + i);
                 }
 
+
                 Console.WriteLine("\n");
-                
+      
 
                 /*
                     StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
@@ -171,43 +175,50 @@ namespace Server
 
         private void StartTrivia()
         {
-            /*
-                  Como se utiliza una SortedList para guardar preguntas/respuestas accedemos a estas por su indice
-            */
-            
+            //Hilo declarado como atributo
+            //La trivia se maneja simultaneamente por hilos
+            int c = 0;
             foreach (TcpClient client in List_Players)
             {
-                int question = 0;
-                while (question <= sList_Question_Answer.Count-1)
-                {
-                    outMsg(client, sList_Question_Answer.Keys[question]);
-
-                    string RespuestaCliente = inMsg(client);
-
-                    string pregunta = sList_Question_Answer.Keys[question];
-
-                    string RespuestaPregunta;
-
-                    if (sList_Question_Answer.TryGetValue(pregunta, out RespuestaPregunta))
-                    {
-                        if (RespuestaPregunta.Equals(RespuestaCliente))
-                        {
-                            Console.WriteLine("Respuesta correcta!");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Respuesta incorrecta!");
-                        }
-                    }
-
-                    question++;
-                }
-
-                outMsg(client, "1");
-
-                string res = inMsg(client);
+                c++;
+                SendQuestionClient = new Thread(() => SendQuestions(client, c));
+                SendQuestionClient.Start();
             }
-            Console.WriteLine("Se han recorrido todos los clientes");
+
+            Console.WriteLine(">>Se han recorrido todos los clientes");
+        }
+
+        private void SendQuestions(TcpClient client, int c)
+        {
+            for(int i = 0; i < sList_Question_Answer.Count;i++)
+            {
+                string pregunta = sList_Question_Answer.Keys[i];
+                outMsg(client, pregunta);
+
+                string RespuestaCliente = inMsg(client);
+
+                Console.WriteLine(Convert.ToString(c) + ": "+ RespuestaCliente);
+
+                string RespuestaPregunta;
+
+                //Se valida la pregunta obteniendo su valor (Asociado a esa llave) y comparando con la respuesta del cliente
+
+                if (sList_Question_Answer.TryGetValue(pregunta, out RespuestaPregunta))
+                {
+                    if (RespuestaPregunta.Equals(RespuestaCliente))
+                    {
+                        Console.WriteLine("Respuesta correcta!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Respuesta incorrecta!");
+                    }
+                }
+            }
+
+            outMsg(client, "1");
+
+            string res = inMsg(client);
         }
 
         private void GetQuestions()
@@ -235,7 +246,6 @@ namespace Server
             else
                 Console.WriteLine(">>El archivo no existe");
         }
-
 
     }
 }

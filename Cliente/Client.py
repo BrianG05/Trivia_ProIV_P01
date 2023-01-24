@@ -76,10 +76,10 @@ def Main():
 
     #Recibe si es el primer jugador o no
     player.WaitingPlayers(ClientSocket=ClientSocket)
-    
+
+    os.system('cls')
     while(True):
-        os.system('cls')
-        print("GAME")
+        print("\nQUESTION: ")
         strData = inMsg(ClientSocket) 
 
         if(strData == "1"):
@@ -90,7 +90,7 @@ def Main():
 
             respuesta = input("Ingresa la respuesta: ")
             outMsg(client=ClientSocket, msg=respuesta +"$")
-
-        print("\nJUEGO TERMINADO")
+        time.sleep(1)
+    print("\nJUEGO TERMINADO")
     
 Main()
