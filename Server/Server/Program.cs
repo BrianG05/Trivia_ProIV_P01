@@ -9,6 +9,7 @@ using System.Threading;
 using System.Xml.Linq;
 using System.Collections;
 using System.IO;
+using System.Timers;
 
 namespace Server
 {
@@ -27,7 +28,18 @@ namespace Server
 
             ClientControl clientControl= new ClientControl();
 
+
             int numPlayer = 0;
+            /*
+                Los clientes son alamcenados en una lista tipo TcpClient.
+                Para identificar al cliente que se encuentra en el hilo y enviar o recibir mensajes se emplea del indice de esa lista
+                con ayuda del num cliente.
+
+                Por ejemplo, si num player se encuentra en 0, significa que en la posicion 0 de la lista se encuentra el primer cliente
+                en conectarse.
+
+                Ademas, la sortedlist Player_Score sigue la misma logica de la lista anterior explicada
+            */
 
             while (true)
             {
@@ -52,12 +64,9 @@ namespace Server
     {
         public static List<TcpClient> List_Players = new List<TcpClient>();
 
-        private static SortedList sList_Player_Score = new SortedList();
+        private static SortedList<string, int> sList_Player_Score = new SortedList<string, int>();
 
         private int StartGameFirstPlayer = 2;
-
-
-        private Thread SendQuestionClient;
 
         /*
              Esta ruta es dada como respuesta por parte del cliente
@@ -91,7 +100,10 @@ namespace Server
 
         public void AddPlayersName(int numPlayer)
         {
-            TcpClient client = List_Players[numPlayer-1];
+            //Se resta 1 para guardar el index en List_Players
+            int IndexClient = (numPlayer - 1);
+
+            TcpClient client = List_Players[IndexClient];
             NetworkStream networkStream = client.GetStream();
 
             outMsg(client, "<<Ingresa tu nombre:$");
@@ -102,11 +114,11 @@ namespace Server
 
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
 
-            WaitingPlayers(numPlayer);
+            WaitingPlayers(numPlayer, IndexClient);
 
         }
 
-        private void WaitingPlayers(int numPlayer) 
+        private void WaitingPlayers(int numPlayer, int IndexClient) 
         {
             if (numPlayer == 1)
             {
@@ -130,8 +142,6 @@ namespace Server
                 {
                     Console.WriteLine("Pregunta: " + i);
                 }
-
-
                 Console.WriteLine("\n");
       
 
@@ -143,6 +153,7 @@ namespace Server
             }
             else
             {
+                //i representa el index del jugador en List_Players
                 int i = 1;
                 while (true)
                 {
@@ -170,56 +181,61 @@ namespace Server
                 }
             }
 
-            StartTrivia();
+            StartTrivia(IndexClient);
         }
 
-        private void StartTrivia()
+        private void StartTrivia(int IndexClient)
         {
-            //Hilo declarado como atributo
-            //La trivia se maneja simultaneamente por hilos
-            int c = 0;
-            foreach (TcpClient client in List_Players)
-            {
-                c++;
-                SendQuestionClient = new Thread(() => SendQuestions(client, c));
-                SendQuestionClient.Start();
-            }
-
-            Console.WriteLine(">>Se han recorrido todos los clientes");
-        }
-
-        private void SendQuestions(TcpClient client, int c)
-        {
-            for(int i = 0; i < sList_Question_Answer.Count;i++)
+            string PlayerName;
+            int Score;
+            int NewScore;
+            for (int i = 0; i < sList_Question_Answer.Count; i++)
             {
                 string pregunta = sList_Question_Answer.Keys[i];
-                outMsg(client, pregunta);
+                outMsg(List_Players[IndexClient], pregunta);
 
-
-                string RespuestaCliente = inMsg(client);
-
-                Console.WriteLine(Convert.ToString(c) + ": "+ RespuestaCliente);
+                string RespuestaCliente = inMsg(List_Players[IndexClient]);
 
                 string RespuestaPregunta;
-
-                //Se valida la pregunta obteniendo su valor (Asociado a esa llave) y comparando con la respuesta del cliente
 
                 if (sList_Question_Answer.TryGetValue(pregunta, out RespuestaPregunta))
                 {
                     if (RespuestaPregunta.Equals(RespuestaCliente))
                     {
-                        Console.WriteLine("Respuesta correcta!");
+                        PlayerName = sList_Player_Score.Keys[IndexClient];
+                        
+
+                        sList_Player_Score.TryGetValue(PlayerName, out Score);
+
+                        //Se suma el puntaje actual
+                        sList_Player_Score[PlayerName] = Score + 1;
+
+                        //Obtenemos el nuevo puntaje
+                        sList_Player_Score.TryGetValue(PlayerName, out NewScore);
+
+                        //Console.WriteLine(PlayerName + "CORRECTO!" + Convert.ToString(NewScore));
                     }
                     else
                     {
-                        Console.WriteLine("Respuesta incorrecta!");
+                        PlayerName = sList_Player_Score.Keys[IndexClient];
+
+                        sList_Player_Score.TryGetValue(PlayerName, out Score);
+
+                        //Se resta el puntaje actual
+                        sList_Player_Score[PlayerName] = Score - 1;
+
+                        //Obtenemos el nuevo puntaje
+                        sList_Player_Score.TryGetValue(PlayerName, out NewScore);
+                        //Console.WriteLine(PlayerName + " INCORRECTO " + Convert.ToString(NewScore));
                     }
                 }
             }
 
-            outMsg(client, "1");
+            outMsg(List_Players[IndexClient], "1");
 
-            string res = inMsg(client);
+            string res = inMsg(List_Players[IndexClient]);
+
+            Console.WriteLine(">>Client: "+Convert.ToString(IndexClient) +" ha terminado la trivia");
         }
 
         private void GetQuestions()
