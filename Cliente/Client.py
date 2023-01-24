@@ -6,6 +6,44 @@ class ClassPlayer:
     def __init__(self, PlayerName):
         self.PlayerName = PlayerName
     
+    def WaitingPlayers(self, ClientSocket):
+        #Bloque correspondiente a la espera de los demas clientes
+        while(True):
+            strData = inMsg(client=ClientSocket)
+
+            if(strData == "1"):
+                self.CreateQuestionFile(ClientSocket)
+                os.system('cls')
+                print("El juego ha iniciado! ")
+                break
+            elif (strData == "2"):
+                os.system('cls')
+                print("Esperando Jugadores")
+                outMsg(client=ClientSocket,msg="2$")
+            else:
+                os.system('cls')
+                print("El juego ha iniciado! ")
+                outMsg(client=ClientSocket,msg="3$")
+                break;
+            time.sleep(1)
+    
+    def CreateQuestionFile(self, ClientSocket):
+        os.system('cls')
+        print("\t CREACIÓN DE PREGUNTAS\n")
+
+        RutaRelativa = "Archivos\QuestionFile.txt"
+        Finish = 0
+        with open(RutaRelativa, "w") as QuestionFile:
+            while(Finish != 1):
+                Pregunta = input("Escribe la pregunta: ")
+                Respuesta = input("Escribe la pregunta: ")
+                Finish = int(input("Ingresa [1] si desea terminar: "))
+                print("----------------------------------------------")
+                QuestionFile.write(Pregunta + ";"+ Respuesta +";"+"\n")
+        
+        #Se envia al server la ruta absoluta del archivo para que lo pueda leer
+        RutaAbsoluta = os.path.abspath(RutaRelativa)
+        outMsg(client=ClientSocket,msg= RutaAbsoluta+"$")
 
 def inMsg(client):
     strMsg = ""
@@ -37,26 +75,7 @@ def Main():
     outMsg(client=ClientSocket,msg=clientName+"$")
 
     #Recibe si es el primer jugador o no
+    player.WaitingPlayers(ClientSocket=ClientSocket)
 
-    #Bloque correspondiente a la espera de los demas clientes
-    while(True):
-        strData = inMsg(ClientSocket)
-
-        if(strData == "1"):
-            input("Presione enter para inciar juego")
-            outMsg(client=ClientSocket,msg="1$")
-            print("El juego ha iniciado! ")
-            break
-        elif (strData == "2"):
-            os.system('cls')
-            print("Esperando Jugadores")
-            outMsg(client=ClientSocket,msg="2$")
-        else:
-            os.system('cls')
-            print("El juego ha iniciado! ")
-            outMsg(client=ClientSocket,msg="3$")
-            break;
-        time.sleep(1)
-
-    print("Ya puede cerrar la ostia paire!")
+    
 Main()

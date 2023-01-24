@@ -53,15 +53,12 @@ namespace Server
 
         private static Hashtable List_Player_Score = new Hashtable();
 
-        private byte[] inData = new byte[64];
-        private byte[] outData = new byte[64];
-
-        private static int StartGameFirstPlayer = 2;
+        private int StartGameFirstPlayer = 2;
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
         {
-            byte[] outData = new byte[64];
+            byte[] outData = new byte[256];
             NetworkStream networkStream = client.GetStream();
             outData = Encoding.ASCII.GetBytes(message);
             networkStream.Write(outData, 0, outData.Length);
@@ -71,10 +68,10 @@ namespace Server
         //Para recibir datos del cliente
         private static string inMsg(TcpClient client)
         {
-            byte[] inData = new byte[64];
+            byte[] inData = new byte[256];
 
             NetworkStream networkStream = client.GetStream();
-            networkStream.Read(inData, 0, 64);
+            networkStream.Read(inData, 0, 256);
             string clientData = Encoding.ASCII.GetString(inData);
             clientData = clientData.Substring(0, clientData.IndexOf("$"));
 
@@ -107,6 +104,8 @@ namespace Server
 
                 string clientData = inMsg(client);
 
+                Console.WriteLine(clientData);
+
                 /*
                     StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
                     terminen sus bucles while. Esta variable solo es alterada por el primer jugador que se conecto
@@ -123,22 +122,22 @@ namespace Server
                     {
                         i = 1;
                     }
-
-                    outMsg(List_Players[i], Convert.ToString(StartGameFirstPlayer) + "$");
-
-                    string clientData = inMsg(List_Players[i]);
-
-                    /*
-                            Si el valor StartGameFirstPlayer envia un 3 a el cliente este mismo regresa otro 3 para terminar bucle
-                    */
-                    if (clientData == "3")
+                    else
                     {
-                       break;
+                        outMsg(List_Players[i], Convert.ToString(StartGameFirstPlayer) + "$");
+
+                        string clientData = inMsg(List_Players[i]);
+
+                        /*
+                            Si el valor StartGameFirstPlayer envia un 3 a el cliente este mismo regresa otro 3 para terminar bucle
+                        */
+                        if (clientData == "3")
+                        {
+                            break;
+                        }
+
+                        i++;
                     }
-
-                    i++;
-
-                    Thread.Sleep(1);
                 }
             }
         }
