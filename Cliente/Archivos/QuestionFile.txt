@@ -1,3 +1,3 @@
-Pregunta1;Respuesta1;
-Pregunta2;Respuesta2;
-Pregunta3;Respuesta3;
+p1;r1;
+p2;r2;
+p3;r3;

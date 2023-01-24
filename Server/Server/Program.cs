@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Xml.Linq;
 using System.Collections;
+using System.IO;
 
 namespace Server
 {
@@ -51,9 +52,16 @@ namespace Server
     {
         public static List<TcpClient> List_Players = new List<TcpClient>();
 
-        private static Hashtable List_Player_Score = new Hashtable();
+        private static Hashtable Hash_Player_Score = new Hashtable();
 
         private int StartGameFirstPlayer = 2;
+        
+        /*
+             Esta ruta es dada como respuesta por parte del cliente
+        */
+        private static string AbsolutePath;
+
+        private static Hashtable Hash_Question_Answer = new Hashtable();
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
@@ -87,7 +95,7 @@ namespace Server
             string clientData = inMsg(client);
 
             //Nombre jugador - Puntaje
-            List_Player_Score.Add(clientData, 0);
+            Hash_Player_Score.Add(clientData, 0);
 
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
 
@@ -104,8 +112,22 @@ namespace Server
 
                 string clientData = inMsg(client);
 
+                Console.WriteLine("\n>>CONTROL RUTA ABSOLUTA ARCHIVO: ");
                 Console.WriteLine(clientData);
+                Console.WriteLine("\n");
 
+                AbsolutePath = clientData;
+
+                //Se obtienen las preguntas y respuestas para ser guardadadas en List_Questions
+                GetQuestions();
+
+                Console.WriteLine("\n>>CONTROL PREGUNTAS ARCHIVO: ");
+
+                foreach (DictionaryEntry i in Hash_Question_Answer)
+                {
+                    Console.WriteLine("Pregunta: " + i.Key + ", Respuesta: " + i.Value);
+                }
+                Console.WriteLine("\n");
                 /*
                     StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
                     terminen sus bucles while. Esta variable solo es alterada por el primer jugador que se conecto
@@ -142,5 +164,30 @@ namespace Server
             }
         }
 
+        private void GetQuestions()
+        {
+            StreamReader reader = new StreamReader(AbsolutePath);
+
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] elementos = line.Split(';');
+
+                //Se guardan las preguntas y respuestas la tabla hash con los elementos del vector elementos
+                Hash_Question_Answer.Add(elementos[0], elementos[1]);
+            }
+        }
+
+        //Para eliminar el archivo una vez terminada la partida
+        private void DeleteQuestionsFile()
+        {
+            if (File.Exists(AbsolutePath))
+            {
+                File.Delete(AbsolutePath);
+                Console.WriteLine(">>El archivo ha sido eliminado");
+            }
+            else
+                Console.WriteLine(">>El archivo no existe");
+        }
     }
 }
