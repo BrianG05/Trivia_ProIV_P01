@@ -89,7 +89,15 @@ def Main():
             print(strData+"\n")
             respuesta = input("Ingresa la respuesta: ")
             outMsg(client=ClientSocket, msg=respuesta +"$")
-        time.sleep(1)
+
+            Answer = inMsg(ClientSocket) 
+            print("--------------------------------")
+            print(Answer)
+
+            outMsg(client=ClientSocket, msg="$")
+        
+        #Espera 3 segundos para mostrar la respuesta
+        time.sleep(3)
     print("\nJUEGO TERMINADO")
     
 Main()

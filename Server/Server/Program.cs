@@ -189,6 +189,7 @@ namespace Server
             string PlayerName;
             int Score;
             int NewScore;
+            string Request;
             for (int i = 0; i < sList_Question_Answer.Count; i++)
             {
                 string pregunta = sList_Question_Answer.Keys[i];
@@ -197,14 +198,15 @@ namespace Server
                 string RespuestaCliente = inMsg(List_Players[IndexClient]);
 
                 string RespuestaPregunta;
-
+                
+                //Se obtiene y valida la respuesta de la pregunta asociada (Valor - Clave)
                 if (sList_Question_Answer.TryGetValue(pregunta, out RespuestaPregunta))
                 {
                     if (RespuestaPregunta.Equals(RespuestaCliente))
                     {
                         PlayerName = sList_Player_Score.Keys[IndexClient];
                         
-
+                        //Se obtiene el puntaje actual
                         sList_Player_Score.TryGetValue(PlayerName, out Score);
 
                         //Se suma el puntaje actual
@@ -212,6 +214,12 @@ namespace Server
 
                         //Obtenemos el nuevo puntaje
                         sList_Player_Score.TryGetValue(PlayerName, out NewScore);
+
+                        Request = "Respuesta correcta! | Puntaje: "+ Convert.ToString(NewScore);
+                        outMsg(List_Players[IndexClient], Request);
+
+                        //Se recibe un msj pero no se emplea para nada
+                        string r = inMsg(List_Players[IndexClient]);
 
                         //Console.WriteLine(PlayerName + "CORRECTO!" + Convert.ToString(NewScore));
                     }
@@ -226,6 +234,14 @@ namespace Server
 
                         //Obtenemos el nuevo puntaje
                         sList_Player_Score.TryGetValue(PlayerName, out NewScore);
+
+
+                        Request = "Respuesta Incorrecta! | Solución: "+ RespuestaPregunta + " | Puntaje: " + Convert.ToString(NewScore);
+                        outMsg(List_Players[IndexClient], Request);
+
+                        //Se recibe un msj pero no se emplea para nada
+                        string r = inMsg(List_Players[IndexClient]);
+
                         //Console.WriteLine(PlayerName + " INCORRECTO " + Convert.ToString(NewScore));
                     }
                 }
