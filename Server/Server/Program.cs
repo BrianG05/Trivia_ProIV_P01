@@ -195,6 +195,7 @@ namespace Server
                 string pregunta = sList_Question_Answer.Keys[i];
                 outMsg(client, pregunta);
 
+
                 string RespuestaCliente = inMsg(client);
 
                 Console.WriteLine(Convert.ToString(c) + ": "+ RespuestaCliente);
