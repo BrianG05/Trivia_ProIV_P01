@@ -52,7 +52,7 @@ namespace Server
     {
         public static List<TcpClient> List_Players = new List<TcpClient>();
 
-        private static Hashtable Hash_Player_Score = new Hashtable();
+        private static SortedList sList_Player_Score = new SortedList();
 
         private int StartGameFirstPlayer = 2;
         
@@ -61,7 +61,7 @@ namespace Server
         */
         private static string AbsolutePath;
 
-        private static Hashtable Hash_Question_Answer = new Hashtable();
+        private static SortedList<string, string> sList_Question_Answer = new SortedList<string, string>();
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
@@ -95,7 +95,7 @@ namespace Server
             string clientData = inMsg(client);
 
             //Nombre jugador - Puntaje
-            Hash_Player_Score.Add(clientData, 0);
+            sList_Player_Score.Add(clientData, 0);
 
             Console.WriteLine(">>Conexion exitosa con: " + clientData);
 
@@ -123,11 +123,14 @@ namespace Server
 
                 Console.WriteLine("\n>>CONTROL PREGUNTAS ARCHIVO: ");
 
-                foreach (DictionaryEntry i in Hash_Question_Answer)
+                foreach (Object i in sList_Question_Answer)
                 {
-                    Console.WriteLine("Pregunta: " + i.Key + ", Respuesta: " + i.Value);
+                    Console.WriteLine("Pregunta: " + i);
                 }
+
                 Console.WriteLine("\n");
+                
+
                 /*
                     StartGameFirstPlayer es una variable de apoyo para que, en los otros clientes y por el lado del cliente se
                     terminen sus bucles while. Esta variable solo es alterada por el primer jugador que se conecto
@@ -162,6 +165,49 @@ namespace Server
                     }
                 }
             }
+
+            StartTrivia();
+        }
+
+        private void StartTrivia()
+        {
+            /*
+                  Como se utiliza una SortedList para guardar preguntas/respuestas accedemos a estas por su indice
+            */
+            
+            foreach (TcpClient client in List_Players)
+            {
+                int question = 0;
+                while (question <= sList_Question_Answer.Count-1)
+                {
+                    outMsg(client, sList_Question_Answer.Keys[question]);
+
+                    string RespuestaCliente = inMsg(client);
+
+                    string pregunta = sList_Question_Answer.Keys[question];
+
+                    string RespuestaPregunta;
+
+                    if (sList_Question_Answer.TryGetValue(pregunta, out RespuestaPregunta))
+                    {
+                        if (RespuestaPregunta.Equals(RespuestaCliente))
+                        {
+                            Console.WriteLine("Respuesta correcta!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Respuesta incorrecta!");
+                        }
+                    }
+
+                    question++;
+                }
+
+                outMsg(client, "1");
+
+                string res = inMsg(client);
+            }
+            Console.WriteLine("Se han recorrido todos los clientes");
         }
 
         private void GetQuestions()
@@ -174,7 +220,7 @@ namespace Server
                 string[] elementos = line.Split(';');
 
                 //Se guardan las preguntas y respuestas la tabla hash con los elementos del vector elementos
-                Hash_Question_Answer.Add(elementos[0], elementos[1]);
+                sList_Question_Answer.Add(elementos[0], elementos[1]);
             }
         }
 
@@ -189,5 +235,7 @@ namespace Server
             else
                 Console.WriteLine(">>El archivo no existe");
         }
+
+
     }
 }

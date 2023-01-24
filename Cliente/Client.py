@@ -76,6 +76,21 @@ def Main():
 
     #Recibe si es el primer jugador o no
     player.WaitingPlayers(ClientSocket=ClientSocket)
+    
+    while(True):
+        os.system('cls')
+        print("GAME")
+        strData = inMsg(ClientSocket) 
 
+        if(strData == "1"):
+            outMsg(client=ClientSocket, msg="2$")
+            break
+        else:
+            print(strData+"\n")
+
+            respuesta = input("Ingresa la respuesta: ")
+            outMsg(client=ClientSocket, msg=respuesta +"$")
+
+        print("\nJUEGO TERMINADO")
     
 Main()
