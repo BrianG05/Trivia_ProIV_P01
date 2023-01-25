@@ -36,11 +36,12 @@ class ClassPlayer:
         with open(RutaRelativa, "w") as QuestionFile:
             while(Finish != 1):
                 Pregunta = input("Escribe la pregunta: ")
-                Respuesta = input("Escribe la pregunta: ")
+                Respuesta = input("Escribe la respuesta: ")
                 Finish = int(input("Ingresa [1] si desea terminar: "))
                 print("----------------------------------------------")
                 QuestionFile.write(Pregunta + ";"+ Respuesta +";"+"\n")
-        
+
+        QuestionFile.close()
         #Se envia al server la ruta absoluta del archivo para que lo pueda leer
         RutaAbsoluta = os.path.abspath(RutaRelativa)
         outMsg(client=ClientSocket,msg= RutaAbsoluta+"$")
@@ -48,7 +49,7 @@ class ClassPlayer:
     def Trivia(self,ClientSocket):
         while(True):
             os.system('cls')
-            print("PREGUNTA: \n")
+            print("PREGUNTA: ")
             strData = inMsg(ClientSocket) 
 
             if(strData == "1"):
@@ -105,8 +106,8 @@ def Main():
     #Mienstras los demas jugadores terminan hay que dejar en espera
     while(True):
         strData = inMsg(ClientSocket) 
-
         if(strData=="True"):
+            outMsg(client=ClientSocket, msg="$")
             break
         else:
             os.system('cls')
@@ -114,8 +115,19 @@ def Main():
             outMsg(client=ClientSocket, msg="continue$")
 
         time.sleep(1)
+
         
     os.system('cls')
     print("\n\tJUEGO TERMINADO")
     print("-------------------------------")
+
+    #se Reciben los o el ganador
+    Winners = inMsg(ClientSocket) 
+
+    print(Winners)
+
+    input("\nPresione enter para finalizar...")
+    outMsg(client=ClientSocket, msg="delete$")
+
+    ClientSocket.close()
 Main()

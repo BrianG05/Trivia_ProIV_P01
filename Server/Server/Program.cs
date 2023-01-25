@@ -82,6 +82,12 @@ namespace Server
         //Se guarda la cantidad de jugadores que van finalizando
         private static int FinishTriviaPlayers= 0;
 
+        //Para evitar que se vuelvan a agregar los ganadores ya que cada cliente ejecuta el codigo en un hilo
+        private static bool FinishAppendWinners = false;
+
+        //Para concatenar ganadores (Aquellos con puntaje igual al max de la sortedlist)
+        StringBuilder winners = new StringBuilder("");
+
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
         {
@@ -243,7 +249,7 @@ namespace Server
                         sList_Player_Score.TryGetValue(PlayerName, out NewScore);
 
 
-                        Request = "Respuesta Incorrecta! | Solución: "+ RespuestaPregunta + " | Puntaje: " + Convert.ToString(NewScore);
+                        Request = "Respuesta Incorrecta! | Solucion: "+ RespuestaPregunta + " | Puntaje: " + Convert.ToString(NewScore);
                         outMsg(List_Players[IndexClient], Request);
 
                         //Se recibe un msj pero no se emplea para nada
@@ -258,7 +264,9 @@ namespace Server
 
             string res = inMsg(List_Players[IndexClient]);
 
-            Console.WriteLine(">>Client: "+Convert.ToString(IndexClient) +" ha terminado la trivia");
+            Console.WriteLine("\n");
+
+            Console.WriteLine(">>Cliente: "+Convert.ToString(IndexClient) +" ha terminado la trivia");
             FinishTriviaPlayers++;
 
             //Esta funcion "Atrapa" a los clientes hasta que todos los demas hayan finalizado
@@ -274,11 +282,50 @@ namespace Server
                     FinishTrivia = true;
                 }
             }
-            //Cuando FinishTrivia cambie a tru no entra en el bucle anterior, envia un true y rompe el ciclo que se encuentra en el cliente
+            //Cuando FinishTrivia cambie a true no entra en el bucle anterior, envia un true y rompe el ciclo que se encuentra en el cliente
             outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia));
 
-            Console.WriteLine("Ah finalizado el juego");
+            //Recibimos una respuesta para seguir el patron de envio - recibo / recibo - envio y evitar errores
+            string resq = inMsg(List_Players[IndexClient]);
 
+            SendWinners(IndexClient);
+        }
+
+        private void SendWinners(int IndexClient)
+        {
+            if(FinishAppendWinners != true) {
+                //Obtenemos el score maximo teniendo en cuenta que pueden haber varios con el mismo Score
+                int maxScore = sList_Player_Score.Values.Max();
+                foreach (var item in sList_Player_Score)
+                {
+                    if(item.Value == maxScore)
+                    {
+                        winners.Append("|"+item.Key + ", Score: " + Convert.ToString(item.Value) + "| ");
+                    }
+                }
+                FinishAppendWinners = true;
+
+                Console.WriteLine("\n>>GANADOR: ");
+                Console.WriteLine(">>" + Convert.ToString(winners));
+                Console.WriteLine("\n");
+
+            }
+
+            //Se envia el string de ganadores
+            outMsg(List_Players[IndexClient], Convert.ToString(winners));
+
+            string r = inMsg(List_Players[IndexClient]);
+
+            TcpClient client = List_Players[IndexClient];
+
+            if(r == "delete")
+            {
+                //Cerramos el cliente
+                client.Close();
+
+                //Se elimina el archivo de las preguntas
+                DeleteQuestionsFile();
+            }
         }
 
         private void GetQuestions()
@@ -293,6 +340,9 @@ namespace Server
                 //Se guardan las preguntas y respuestas la tabla hash con los elementos del vector elementos
                 sList_Question_Answer.Add(elementos[0], elementos[1]);
             }
+
+            //Cerramos el archivo para evitar futuros problemas
+            reader.Close();
         }
 
         //Para eliminar el archivo una vez terminada la partida
@@ -304,7 +354,7 @@ namespace Server
                 Console.WriteLine(">>El archivo ha sido eliminado");
             }
             else
-                Console.WriteLine(">>El archivo no existe");
+                Console.WriteLine(">>El ya fue eliminado!");
         }
 
     }
