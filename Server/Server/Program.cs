@@ -73,7 +73,14 @@ namespace Server
         */
         private static string AbsolutePath;
 
+        //Guarda las preguntas en un sortedlist con su respuesta
         private static SortedList<string, string> sList_Question_Answer = new SortedList<string, string>();
+
+        //Determina cuando todos los jugadores terminaron su trivia
+        private static bool FinishTrivia = false;
+
+        //Se guarda la cantidad de jugadores que van finalizando
+        private static int FinishTriviaPlayers= 0;
 
         //Para enviar datos al cliente
         private static void outMsg(TcpClient client, string message)
@@ -252,6 +259,26 @@ namespace Server
             string res = inMsg(List_Players[IndexClient]);
 
             Console.WriteLine(">>Client: "+Convert.ToString(IndexClient) +" ha terminado la trivia");
+            FinishTriviaPlayers++;
+
+            //Esta funcion "Atrapa" a los clientes hasta que todos los demas hayan finalizado
+            while(FinishTrivia != true)
+            {
+                //Se manda como mensaje el estado de FinishTrivia, es decir, falso o verdadero
+                outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia));
+
+                string requestClient = inMsg(List_Players[IndexClient]);
+
+                if (FinishTriviaPlayers == List_Players.Count)
+                {
+                    FinishTrivia = true;
+                }
+            }
+            //Cuando FinishTrivia cambie a tru no entra en el bucle anterior, envia un true y rompe el ciclo que se encuentra en el cliente
+            outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia));
+
+            Console.WriteLine("Ah finalizado el juego");
+
         }
 
         private void GetQuestions()

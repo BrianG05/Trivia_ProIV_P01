@@ -45,6 +45,29 @@ class ClassPlayer:
         RutaAbsoluta = os.path.abspath(RutaRelativa)
         outMsg(client=ClientSocket,msg= RutaAbsoluta+"$")
 
+    def Trivia(self,ClientSocket):
+        while(True):
+            os.system('cls')
+            print("PREGUNTA: \n")
+            strData = inMsg(ClientSocket) 
+
+            if(strData == "1"):
+                outMsg(client=ClientSocket, msg="2$")
+                break
+            else:
+                print(strData+"\n")
+                respuesta = input("Ingresa la respuesta: ")
+                outMsg(client=ClientSocket, msg=respuesta +"$")
+
+                Answer = inMsg(ClientSocket) 
+                print("--------------------------------")
+                print(Answer)
+
+                outMsg(client=ClientSocket, msg="$")
+            
+            #Espera 3 segundos para mostrar la respuesta
+            time.sleep(3)
+
 def inMsg(client):
     strMsg = ""
     byteData = client.recv(64)
@@ -77,27 +100,22 @@ def Main():
     #Recibe si es el primer jugador o no
     player.WaitingPlayers(ClientSocket=ClientSocket)
 
+    player.Trivia(ClientSocket=ClientSocket)
+
+    #Mienstras los demas jugadores terminan hay que dejar en espera
     while(True):
-        os.system('cls')
-        print("PREGUNTA: \n")
         strData = inMsg(ClientSocket) 
 
-        if(strData == "1"):
-            outMsg(client=ClientSocket, msg="2$")
+        if(strData=="True"):
             break
         else:
-            print(strData+"\n")
-            respuesta = input("Ingresa la respuesta: ")
-            outMsg(client=ClientSocket, msg=respuesta +"$")
+            os.system('cls')
+            print("Esperando a que los otros jugadores finalicen")
+            outMsg(client=ClientSocket, msg="continue$")
 
-            Answer = inMsg(ClientSocket) 
-            print("--------------------------------")
-            print(Answer)
-
-            outMsg(client=ClientSocket, msg="$")
+        time.sleep(1)
         
-        #Espera 3 segundos para mostrar la respuesta
-        time.sleep(3)
-    print("\nJUEGO TERMINADO")
-    
+    os.system('cls')
+    print("\n\tJUEGO TERMINADO")
+    print("-------------------------------")
 Main()
