@@ -206,7 +206,7 @@ namespace Server
             for (int i = 0; i < sList_Question_Answer.Count; i++)
             {
                 string pregunta = sList_Question_Answer.Keys[i];
-                outMsg(List_Players[IndexClient], pregunta);
+                outMsg(List_Players[IndexClient], pregunta +"$");
 
                 string RespuestaCliente = inMsg(List_Players[IndexClient]);
 
@@ -228,7 +228,7 @@ namespace Server
                         //Obtenemos el nuevo puntaje
                         sList_Player_Score.TryGetValue(PlayerName, out NewScore);
 
-                        Request = "Respuesta correcta! | Puntaje: "+ Convert.ToString(NewScore);
+                        Request = "Respuesta correcta! | Puntaje: "+ Convert.ToString(NewScore) +"$";
                         outMsg(List_Players[IndexClient], Request);
 
                         //Se recibe un msj pero no se emplea para nada
@@ -249,7 +249,7 @@ namespace Server
                         sList_Player_Score.TryGetValue(PlayerName, out NewScore);
 
 
-                        Request = "Respuesta Incorrecta! | Solucion: "+ RespuestaPregunta + " | Puntaje: " + Convert.ToString(NewScore);
+                        Request = "Respuesta Incorrecta! | Solucion: "+ RespuestaPregunta + " | Puntaje: " + Convert.ToString(NewScore) +"$";
                         outMsg(List_Players[IndexClient], Request);
 
                         //Se recibe un msj pero no se emplea para nada
@@ -260,7 +260,7 @@ namespace Server
                 }
             }
 
-            outMsg(List_Players[IndexClient], "1");
+            outMsg(List_Players[IndexClient], "1$");
 
             string res = inMsg(List_Players[IndexClient]);
 
@@ -273,7 +273,7 @@ namespace Server
             while(FinishTrivia != true)
             {
                 //Se manda como mensaje el estado de FinishTrivia, es decir, falso o verdadero
-                outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia));
+                outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia) +"$");
 
                 string requestClient = inMsg(List_Players[IndexClient]);
 
@@ -283,7 +283,7 @@ namespace Server
                 }
             }
             //Cuando FinishTrivia cambie a true no entra en el bucle anterior, envia un true y rompe el ciclo que se encuentra en el cliente
-            outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia));
+            outMsg(List_Players[IndexClient], Convert.ToString(FinishTrivia) + "$");
 
             //Recibimos una respuesta para seguir el patron de envio - recibo / recibo - envio y evitar errores
             string resq = inMsg(List_Players[IndexClient]);
@@ -312,7 +312,7 @@ namespace Server
             }
 
             //Se envia el string de ganadores
-            outMsg(List_Players[IndexClient], Convert.ToString(winners));
+            outMsg(List_Players[IndexClient], Convert.ToString(winners) + "$");
 
             string r = inMsg(List_Players[IndexClient]);
 

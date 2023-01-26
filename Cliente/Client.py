@@ -37,7 +37,7 @@ class ClassPlayer:
             while(Finish != 1):
                 Pregunta = input("Escribe la pregunta: ")
                 Respuesta = input("Escribe la respuesta: ")
-                Finish = int(input("Ingresa [1] si desea terminar: "))
+                Finish = int(input("Ingresa [1] si desea terminar, [0] si desea agregar otra: "))
                 print("----------------------------------------------")
                 QuestionFile.write(Pregunta + ";"+ Respuesta +";"+"\n")
 
@@ -67,7 +67,7 @@ class ClassPlayer:
                 outMsg(client=ClientSocket, msg="$")
             
             #Espera 3 segundos para mostrar la respuesta
-            time.sleep(3)
+            time.sleep(3) 
 
 def inMsg(client):
     strMsg = ""
@@ -111,7 +111,7 @@ def Main():
             break
         else:
             os.system('cls')
-            print("Esperando a que los otros jugadores finalicen")
+            print("Esperando a que los otros jugadores finalicen...")
             outMsg(client=ClientSocket, msg="continue$")
 
         time.sleep(1)

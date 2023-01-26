@@ -1,0 +1,8 @@
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\bin\Debug\Cliente_C.exe.config
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\bin\Debug\Cliente_C.exe
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\bin\Debug\Cliente_C.pdb
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\obj\Debug\Cliente_C.csproj.AssemblyReference.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\obj\Debug\Cliente_C.csproj.SuggestedBindingRedirects.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\obj\Debug\Cliente_C.csproj.CoreCompileInputs.cache
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\obj\Debug\Cliente_C.exe
+C:\Users\brian\Documents\Workspace\C#\Proyecto 01\Cliente_C\Cliente_C\obj\Debug\Cliente_C.pdb
